@@ -1,0 +1,69 @@
+name: mailgun
+version: 0.1
+description: Sending mail via Mailgun
+author:
+  name: Maciej Kucharz
+
+config:
+  MAILGUN_API_KEY:
+    prompt: true
+
+parameters:
+  email_id:
+    type: integer
+    example: 320
+  reason:
+    type: string
+    example: "Internal error!"
+
+scripts:
+  send_email:
+    runtime_name: naked-python
+    file: scripts/send_email.py
+    full_permissons: true # This script has an access to the whole instance data
+
+endpoints:
+  send_mail:
+    POST:
+      script: send_email
+      description: Sends email
+      parameters:
+        email:
+          type: email
+          # yes we have high-level types!
+          description: Email of the recipient
+          example: "maciek@kucharz.net"
+      response:
+        mimetype: application/json
+        examples:
+          - exit_code: 200
+            description: "Email sent successfully"
+            parameters:
+              - email_id
+            example: >
+              {
+                "email_id":320
+              }
+          - exit_code: 400
+            description: "Error while sending email"
+            parameters:
+              - reason
+            example: >
+              {
+                "reason":"Internal error!"
+              }
+
+events:
+  email-delivery-success:
+    description: "Raised after successful e-mail delivery"
+    parameters:
+      - email_id
+  email-delivery-failed:
+    description: "Raised when sending email failed"
+    parameters:
+      - email_id
+      - reason
+
+dependencies:
+  runtimes:
+      - runtime_name: naked-python

@@ -1,0 +1,53 @@
+insance_name: my_instance_name
+
+# global instance config
+config:
+  SEGMENT_WRITE_KEY: 43njdfuo89fewpf
+
+# hosting
+hosting:
+  production:
+    description: Production version of the dashboard
+    cname: production.my_domain.com
+    src: ../build
+  staging:
+    description: Staging version of the dashboard
+    cname: staging.my_domain.com
+    src: ../build
+
+classes:
+  posts:
+    schema:
+      - name: title
+        type: string
+      - name: body
+        type: text
+
+# TODO
+#channels:
+
+event_handlers:
+  # builtin event
+  data.user.created: api.mailgun.send_mail
+  schedule.crontab.*/5 * * * *: api.mailgun.check_mail
+
+dependencies:
+  sockets:
+    # socket installed from a folder
+    mailgun:
+      src: ./syncano-socket-mailgun
+      config:
+        MAILGUN_API_KEY: 132423nj32k2k34dk2
+    # socket installed from a Syncano Registry
+    synq:
+      src: syncano-socket-synq
+      config:
+        SYNQ_API_KEY: 378tfdbjbs;;we
+        SYNQ_ACCOUNT: my_account
+    # socket installed from Github
+    countries:
+      src: https://github.com/eyedea-io/syncano-socket-countries.git
+
+  runtimes:
+    naked-python:
+      src: ./syncano-runtime-naked-python
